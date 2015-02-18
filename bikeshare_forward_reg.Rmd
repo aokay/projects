@@ -1,0 +1,29 @@
+
+
+```{r}
+
+numberOfVariables=ncol(myDataFrame)-1 # For the response variable
+# errorsMatrix to save the errors for each fold and for each model size
+errorsMatrix=matrix(NA,K,numberOfVariables)
+# Loop through the folds
+for(k in 1:K){
+  # Print the progression
+  cat("Fold",k," Forward Stepwise Generation \n")
+  # The training index (which observations will be used to train the model
+  trainingIndex=(folds!=k)
+  # Models Generation with forward method (one for each variables until numberOfVariables)
+  subsetModels=regsubsets(Response~.,data=myDataFrame[trainingIndex,],nvmax=numberOfVariables,method="forward")
+  # For each susbet model (here=numberOfVariables), calculate the predictions and the errors
+  for(i in 1:numberOfVariables){
+    testIndex=-trainingIndex # or testIndex=(folds==k)
+    # Predictions with the function in the annex (see below)
+    pred=predict(subsetModels,myDataFrame[testIndex,],id=i)
+    # compute and save the mean squared error of the predictions
+    errorsMatrix[k,i]=mean((myDataFrame$Response[testIndex]-pred)^2)
+  }
+}
+
+```
+
+
+```

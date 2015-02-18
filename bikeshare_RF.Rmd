@@ -1,0 +1,107 @@
+Data Set
+```{r}
+# Training Set for Bikeshare
+train_full<-read.csv('/Users/alexkuo85/GitHub/project/kaggle/bikeshare/train.csv')
+
+# Test Set for Bikeshare
+test_full<-read.csv('/Users/alexkuo85/GitHub/project/kaggle/bikeshare/test.csv')
+attach(train_full)
+```
+
+Create 24 time dataset
+```{r}
+# Gets a list of train data 
+train_list=list()
+x=0
+for (i in 1:24) {
+  if( x < 10) {
+      train_list[[i]] <- read.csv(paste("/Users/alexkuo85/GitHub/project/kaggle/bikeshare/data/train/train_0", x, ".csv", sep=""))
+  x=x+1
+  } else {
+      train_list[[i]] <- read.csv(paste("/Users/alexkuo85/GitHub/project/kaggle/bikeshare/data/train/train_", x, ".csv", sep=""))
+  x=x+1
+  }
+}
+
+# Gets a list of test data 
+test_list=list()
+x=0
+for (i in 1:24) {
+  if( x < 10) {
+      test_list[[i]] <- read.csv(paste("/Users/alexkuo85/GitHub/project/kaggle/bikeshare/data/test/test_0", x, ".csv", sep=""))
+  x=x+1
+  } else {
+      test_list[[i]] <- read.csv(paste("/Users/alexkuo85/GitHub/project/kaggle/bikeshare/data/test/test_", x, ".csv", sep=""))
+  x=x+1
+  }
+}
+
+```
+
+Histogram of Plots in time periods
+```{r}
+par(mfrow = c(5,5))
+for(i in 1:24) {
+  hist(train_list[[i]]$count,xlab="Count of Hire",main=if(i-1<10) {paste("Time 0", i-1,":00:00",sep="") }else {paste("Time ", i-1,":00:00",sep="")})
+}
+```
+
+Exploratory Data Analysis
+```{r}
+# Plot graph time vs total no. of rentals
+# x-axis = time, y-axis = count
+par(mfrow = c(5,5))
+for(i in 1:23) {
+plot(train_list[[i]]$datetime,train_list[[i]]$count, type="b",col=c(train_list[[i]]$season), xlab=if(i<10) {paste("Time 0", i,":00:00",sep="") }else {paste("Time ", i,":00:00",sep="")} , ylab="Number of Bikes hired")
+}
+```
+
+Forward Step-Wise Selection
+AND
+GBM (Gradient Boosting Method)
+```{r}
+library(randomForest)
+set.seed(1)
+
+attach(train_list[i])
+rf.bike=randomForest(count~season+holiday+workingday+weather+temp+atemp+humidity+windspeed,data=train_list[i],mtry=3,importance=TRUE)
+
+yhat.rf=predict(rf.bike,newdata=test_list[i])
+
+round(yhat.rf)
+
+#Output to csv file
+write.csv(result_list[order(as.Date(result_list$datetime, "%Y-%m-%d")),], file = "/Users/alexkuo85/GitHub/project/kaggle/bikeshare/results.csv")
+
+```
+
+```{r}
+# Score:1.41765 Rank:1984  01/02/2015 
+
+# Score:1.41760 Rank:1944  01/02/2015 Add interaction effect with temp and season
+
+# Score:1.32251 Rank:1887  03/02/2015 Add forward selection with gbm, Train Error: 21299.9 , iter_CV: 6
+
+# Score:1.32204 Rank:1886  03/02/2015 Add forward selection with gbm, Train Error: 21301.29 , iter_CV: 6
+
+# Score:0.69750 Rank:1550  05/02/2015 Add forward selection with gbm with time slice comparison, Train Error: avg 1120.663 , iter_CV: 6
+
+
+# Score:0.47862 Rank:666  05/02/2015 Add all variables with gbm with time slice comparison, Train Error: avg 1119.123 , iter_CV: 6
+
+#train_err
+# [1]   480.00430   207.64965   113.97855    33.79911     8.61111    47.73739   604.32317  4260.34717 11110.11803
+#[10]  3063.53253  1930.36692  3537.27385  4572.82460  4877.98373  4646.82558  4876.80290  6080.68813 13225.24273
+#[19] 12061.41477  6035.14077  2666.25866  2316.46822  1635.53787  1134.85420
+
+# mean: 3730.324
+
+# Score:0.47781 Rank:662  07/02/2015 Add forward seleciton variables with gbm with time slice comparison, , iter_CV: 6
+#train_err
+# [1]   489.00751   220.46928   128.75841    39.05311     8.13522    47.76798   640.08204  4938.74679 12171.17171  3667.72902
+#[11]  1821.87954  3437.90235    4811.60641  4951.48373  4584.98909  4898.00689  6069.46272 12749.48550 11868.96714  5676.43607
+#[21]  2596.45592  2243.69811  1626.67746  1115.65304
+
+# mean: 3783.484
+
+```

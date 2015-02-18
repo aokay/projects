@@ -1,0 +1,123 @@
+Data Set
+```{r}
+# Training Set for Bikeshare
+train_full<-read.csv('/Users/alexkuo85/GitHub/project/kaggle/bikeshare/train.csv')
+
+# Test Set for Bikeshare
+test_full<-read.csv('/Users/alexkuo85/GitHub/project/kaggle/bikeshare/test.csv')
+attach(train_full)
+```
+
+Create 24 time dataset
+```{r}
+# Gets a list of train data 
+train_list=list()
+
+for (i in 1:12) {
+  if( i < 10) {
+      train_list[[i]] <- read.csv(paste("/Users/alexkuo85/GitHub/project/kaggle/bikeshare/data/train/trainmonth/train_month_0", i, ".csv", sep=""))
+  } else {
+      train_list[[i]] <- read.csv(paste("/Users/alexkuo85/GitHub/project/kaggle/bikeshare/data/train/trainmonth/train_month_", i, ".csv", sep=""))
+  }
+}
+
+# Gets a list of test data 
+test_list=list()
+for (i in 1:12) {
+  if( i < 10) {
+      test_list[[i]] <- read.csv(paste("/Users/alexkuo85/GitHub/project/kaggle/bikeshare/data/test/testmonth/test_month_0", i, ".csv", sep=""))
+  } else {
+      test_list[[i]] <- read.csv(paste("/Users/alexkuo85/GitHub/project/kaggle/bikeshare/data/test/testmonth/test_month_", i, ".csv", sep=""))
+  }
+}
+
+```
+
+Histogram of Plots in time periods
+```{r}
+par(mfrow = c(5,5))
+for(i in 1:24) {
+  hist(train_list[[i]]$count,xlab="Count of Hire",main=if(i-1<10) {paste("Time 0", i-1,":00:00",sep="") }else {paste("Time ", i-1,":00:00",sep="")})
+}
+```
+
+Exploratory Data Analysis
+```{r}
+# Plot graph time vs total no. of rentals
+# x-axis = time, y-axis = count
+par(mfrow = c(5,5))
+for(i in 1:23) {
+plot(train_list[[i]]$datetime,train_list[[i]]$count, type="b",col=c(train_list[[i]]$season), xlab=if(i<10) {paste("Time 0", i,":00:00",sep="") }else {paste("Time ", i,":00:00",sep="")} , ylab="Number of Bikes hired")
+}
+```
+
+Forward Step-Wise Selection
+AND
+GBM (Gradient Boosting Method)
+```{r}
+library(leaps)
+library(gbm)
+library(date)
+
+# Set variables
+set.seed(111) # Random for bag.fraction 
+ntrees = 5000
+shrinkage = 0.001
+depth=9
+
+result_list=list()
+train_err=rep(NA,12)
+
+
+for( j in 1:12) {
+  
+attach(train_list[[j]])
+
+regfit.fwd=regsubsets(count~season+holiday+workingday+weather+temp+atemp+humidity+windspeed, data=train_list[[j]],nvmax=8,method="forward")
+
+reg.summary=summary(regfit.fwd)
+
+max_var<-which.max(reg.summary$adjr2)
+
+fwd_reg=rep(NA,(max_var-1))
+x=2
+for( i in 1:max_var) {
+    # Create array of variables
+    fwd_reg[i]<-names(coef(regfit.fwd,max_var))[x]
+    x=x+1q
+}
+
+fmla<-as.formula(paste("count ~ ", paste(fwd_reg, collapse= "+")))
+
+gbm0<-gbm(fmla, data = train_list[[j]], train.fraction = 1, interaction.depth = depth, shrinkage = shrinkage, n.trees = ntrees, bag.fraction = 0.5, cv.folds = 10, distribution = "gaussian", verbose = T, n.cores=2,n.minobsinnode=10)
+
+# Cross Validation
+best.iter_CV <- gbm.perf(gbm0, method = "cv")
+train_err[j]<-gbm0$train.error[best.iter_CV]
+
+yhat.boost<-predict(gbm0,test_list[[j]],best.iter_CV)
+
+# Create data.frame for predicted results and timestamp
+result<- as.data.frame(round(yhat.boost))
+time<-as.data.frame(test_list[[j]]$datetime)
+
+bind_result<-cbind(time,result)
+names(bind_result)=c("datetime","count")
+
+bind_result[order(bind_result$datetime),]
+
+# row bind results together from test set
+result_list=rbind(result_list,bind_result)
+
+}
+
+
+#Output to csv file
+write.csv(result_list[order(as.Date(result_list$datetime, "%Y-%m-%d")),], file = "/Users/alexkuo85/GitHub/project/kaggle/bikeshare/results.csv")
+
+```
+
+```{r}
+
+
+```

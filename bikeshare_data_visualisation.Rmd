@@ -1,0 +1,34 @@
+
+```{r}
+
+# Training Set for Bikeshare
+train_full<-read.csv('/Users/alexkuo85/GitHub/project/kaggle/bikeshare/train.csv')
+
+# Test Set for Bikeshare
+test_full<-read.csv('/Users/alexkuo85/GitHub/project/kaggle/bikeshare/test.csv')
+attach(train_full)
+
+```
+
+
+```{r}
+library(ggplot2)
+library(date)
+
+
+train_full$day <- weekdays(as.Date(train_full$datetime))
+train_full$time<- strptime(train_full$datetime, format="%Y-%m-%d %H:%M:%S")
+train_full$month<-format(time,'%b')
+train_full$time$hour<-format(train_full$time,'%H')
+
+day_hour_counts <- as.data.frame(aggregate(train_full[grep("Feb",train_full$month),"count"], list(train_full[grep("Feb",train_full$month),]$day, train_full[grep("Feb",train_full$month),]$time$hour), mean))
+
+day_hour_counts$Group.1 <- factor(day_hour_counts$Group.1, ordered=TRUE, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+
+day_hour_counts$hour <- as.numeric(as.character(day_hour_counts$Group.2))
+
+ggplot(day_hour_counts, aes(x = as.factor(day_hour_counts$hour), y = day_hour_counts$Group.1)) + geom_tile(aes(fill = x)) + scale_fill_gradient(name="Average Counts", low="white", high="purple") + theme(axis.title.y = element_blank())
+
+
+hist(train_full$time$hour,train_full$count)
+```
