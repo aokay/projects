@@ -11,7 +11,7 @@ library(plotly)
 shinyServer(function(input, output, session) {
 
   # Read .csv file for training set
-  train_full<-read.csv('/Users/alexkuo85/GitHub/project/kaggle/bikeshare/train.csv')
+  train_full<-read.csv('train.csv')
   
   # Break the datetime variable down
   train_full$day <- weekdays(as.Date(train_full$datetime))
@@ -21,8 +21,10 @@ shinyServer(function(input, output, session) {
   train_full$hour<- format(train_full$time,'%H') 
   
   bike_year_data<-train_full
-  # Fill in the spot we created for a plot
+  # Fill in   the spot we created for a plot
   output$bikesharePlot <- renderPlot({
+    
+    print(input$goButton)
     
     # Reactive Button
     if (input$goButton == 0) {  
@@ -57,8 +59,10 @@ shinyServer(function(input, output, session) {
     
     } else {
       
-      bike_year_data<-isolate(train_full[grep(input$date,train_full$time),]) 
+      bike_year_data<-train_full[grep(input$date,train_full$time),]
       day_hour_counts <- as.data.frame(aggregate(bike_year_data[,"count"], list(bike_year_data$day, bike_year_data$time$hour), mean))
+      
+      input$goButton=0
     }
     
     # Factor function to encode a vector in categories 
@@ -247,8 +251,13 @@ output$plot <- renderUI({
       type = "box"
     )
   )
+  layout<-list(
+    title="Washington DC BikeShare",
+    yaxis=list(title="Bikes Hired"),
+    xaxis=list(title="Hours in a day")
+  )
     
-  res<- py$plotly(data, kwargs=list( filename="box-plot-jitter", fileopt="overwrite",auto_open=FALSE))
+  res<- py$plotly(data, kwargs=list(layout=layout,filename="box-plot-jitter", fileopt="overwrite",auto_open=FALSE))
   
   
   py <- plotly("AOKAY", "rds4784d66", "https://plot.ly")  # Open Plotly connection  
