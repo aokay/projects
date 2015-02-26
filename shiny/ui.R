@@ -3,39 +3,49 @@ library(markdown)
 
 
 shinyUI(navbarPage("BikeShare",fluid=TRUE,
-                   
 tabPanel("Heatmap",
          # Generate a row with a sidebar
          sidebarLayout(fluid=TRUE,
            
            # Define the sidebar with one input
            sidebarPanel(
+             # Partial example
              selectInput("years", "Years:", 
                          choices=list("All","2011","2012")),
              selectInput("months", "Months:", 
                          choices=list("All","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")),
              selectInput("days", "Days:", 
                          choices=list("All","Mon","Tues","Wed","Thur","Fri","Sat","Sun")),
+             #submitButton("Search"),
+             actionButton("goButton1", "Search"),
              br(),
+             hr(),
              dateInput('date',
                        label = 'Date input: yyyy-mm-dd',
                        min = "2011-01-01",
                        max = "2012-12-31",
-                       value="2011-01-01",
+                       value="",
                        
-             ),
-             actionButton("goButton", "Search Date"),
+             ),    
+             actionButton("goButton2", "Search"),
              hr(),
-             helpText("Data from Washington DC https://www.capitalbikeshare.com/")
-
+             tags$a(href="https://www.kaggle.com/","Kaggle Competition"),
+             br(),
+             tags$a(href="https://www.capitalbikeshare.com/","Washington DC BikeShare Website"),
+             hr()
            ),
 
            # Create a spot for the barplot
            mainPanel(
-             plotOutput("bikesharePlot")  
+             tabsetPanel(type="tabs",
+                    tabPanel("Plot",plotOutput("bikesharePlot")),
+                    #tabPanel("Data Table",tableOutput("table"))
+                    tabPanel("Data Table",dataTableOutput(outputId="table"))
+             )
            ) 
                
          )
+         
         
 
 ),
