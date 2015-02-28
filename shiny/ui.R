@@ -29,20 +29,20 @@ tabPanel("Heatmap",
              ),    
              actionButton("goButton2", "Search"),
              hr(),
-             tags$a(href="https://www.kaggle.com/","Kaggle Competition"),
+             tags$a(href="https://www.kaggle.com/c/bike-sharing-demand","Kaggle Competition"),
              br(),
              tags$a(href="https://www.capitalbikeshare.com/","Washington DC BikeShare Website"),
-             hr()
+             hr(),
+             downloadButton('downloadPlot', 'Download Plot')
            ),
 
            # Create a spot for the barplot
            mainPanel(
              tabsetPanel(type="tabs",
                     tabPanel("Plot",plotOutput("bikesharePlot")),
-                    #tabPanel("Data Table",tableOutput("table"))
                     tabPanel("Data Table",dataTableOutput(outputId="table"))
              )
-           ) 
+           )
                
          )
          
@@ -63,8 +63,9 @@ tabPanel("Plot",
                         c("Plot"="plot",
                           "Line" = "line",
                           "SE (95% CI)" = "se",
-                          "Boxplot"="boxplot")),
-           hr()         
+                          "Boxplot"="boxplot"))#,
+           #hr(),
+           #downloadButton('downloadPlot', 'Download Plot')
          ),
          mainPanel(width=8,
            plotOutput("scatterPlot")
