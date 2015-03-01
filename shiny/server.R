@@ -3,6 +3,7 @@ library(ggplot2)
 library(datasets)
 library(splines)
 library(plotly)
+library(shinyapps)
 
 
 # Rely on the 'train.csv' dataset in the datasets for Bikeshare
