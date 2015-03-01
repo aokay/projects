@@ -22,9 +22,6 @@ shinyServer(function(input, output, session) {
   
   bike_year_data<-train_full
   
-  print(Sys.Date())
-  
-  
     values <- reactiveValues()
     
     
@@ -228,6 +225,29 @@ shinyServer(function(input, output, session) {
     return(p)
       
   })
+  
+  #plotInput = function() {
+  #  p<-ggplot(values$output, aes(x = as.factor(hours), y = Group.1)) + xlab("Hours")  + geom_tile(aes(fill = x)) + scale_fill_gradient(name="Average Counts", low="white", high="purple") + theme(axis.title.y = element_blank())
+  #  p<-p+values$label
+  #  return(p)
+  #}
+  
+  plotInput <- reactive({
+    p<-ggplot(values$output, aes(x = as.factor(hours), y = Group.1)) + xlab("Hours")  + geom_tile(aes(fill = x)) + scale_fill_gradient(name="Average Counts", low="white", high="purple") + theme(axis.title.y = element_blank())
+    p<-p+values$label
+  })
+  
+  
+  # Save graphs/plot
+  output$downloadPlot <- downloadHandler(
+    filename = function() {"heatmap.png"},
+    content = function(file) {
+      #ggsave(plotInput,file)
+      png(file)
+      print(plotInput()) # Fixed solution with this link http://stackoverflow.com/questions/14810409/save-plots-made-in-a-shiny-app
+      dev.off()
+    }
+  )
   
   # Summary Table creation
   output$table<-renderDataTable({
