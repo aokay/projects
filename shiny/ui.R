@@ -36,9 +36,9 @@ tabPanel("Heatmap",
              br(),
              tags$a(href="https://www.capitalbikeshare.com/","Washington DC BikeShare Website"),
              hr(),
-             br()
-             #br(),
-             #downloadButton('downloadPlot', 'Download Plot')
+             br(),
+             br(),
+             downloadButton('downloadPlot', 'Download Plot')
            ),
 
            # Create a spot for the barplot
@@ -47,12 +47,9 @@ tabPanel("Heatmap",
                     tabPanel("Plot",plotOutput("bikesharePlot")),
                     tabPanel("Data Table",dataTableOutput(outputId="table"))
              )
-           )
-               
+           )      
          )
          
-        
-
 ),
 tabPanel("Plot",
          sidebarLayout(fluid=TRUE,
@@ -79,8 +76,6 @@ tabPanel("Plot",
   ),
 tabPanel("Interactive Boxplot",
      sidebarLayout(fluid=TRUE,
-     #pageWithSidebar(
-       #headerPanel(title=HTML("Plotly in Shiny"), windowTitle="Plotly in Shiny"),
        sidebarPanel(
            selectInput("years3", "Years:", 
                        choices=list("All","2011","2012")),
@@ -93,7 +88,7 @@ tabPanel("Interactive Boxplot",
          mainPanel(
            htmlOutput("plot")
          ) 
-     #)
+
      )
 )
 )
