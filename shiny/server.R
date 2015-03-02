@@ -1,8 +1,8 @@
-library(shiny)
+
 library(ggplot2)
 library(splines)
 library(plotly)
-library(shinyapps)
+
 
 
 # Rely on the 'train.csv' dataset in the datasets for Bikeshare
@@ -23,7 +23,6 @@ shinyServer(function(input, output, session) {
   bike_year_data<-train_full
   
     values <- reactiveValues()
-    
     
     observe({
       

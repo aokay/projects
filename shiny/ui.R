@@ -1,5 +1,5 @@
 library(shiny)
-
+library(markdown)
 
 shinyUI(navbarPage("BikeShare",fluid=TRUE,
 tabPanel("Heatmap",
@@ -14,7 +14,6 @@ tabPanel("Heatmap",
                          choices=list("All","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")),
              selectInput("days", "Days:", 
                          choices=list("All","Mon","Tues","Wed","Thur","Fri","Sat","Sun")),
-             #submitButton("Search"),
              actionButton("goButton1", "Search"),
              br(),
              hr(),
@@ -23,7 +22,7 @@ tabPanel("Heatmap",
                        label = 'Date input: yyyy-mm-dd',
                        min = "2011-01-01",
                        max = "2012-12-31",
-                       value="",
+                       value=""
                        
              ),    
              actionButton("goButton2", "Search"),
@@ -34,7 +33,6 @@ tabPanel("Heatmap",
              br(),
              tags$a(href="https://www.capitalbikeshare.com/","Washington DC BikeShare Website"),
              hr(),
-             br(),
              br(),
              downloadButton('downloadPlot', 'Download Plot')
            ),
