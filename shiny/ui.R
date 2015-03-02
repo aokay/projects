@@ -36,9 +36,9 @@ tabPanel("Heatmap",
              br(),
              tags$a(href="https://www.capitalbikeshare.com/","Washington DC BikeShare Website"),
              hr(),
-             br(),
-             br(),
-             downloadButton('downloadPlot', 'Download Plot')
+             br()
+             #br(),
+             #downloadButton('downloadPlot', 'Download Plot')
            ),
 
            # Create a spot for the barplot
