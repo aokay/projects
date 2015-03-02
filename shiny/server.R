@@ -1,6 +1,5 @@
 library(shiny)
 library(ggplot2)
-library(datasets)
 library(splines)
 library(plotly)
 library(shinyapps)
@@ -223,27 +222,26 @@ shinyServer(function(input, output, session) {
     p<-ggplot(values$output, aes(x = as.factor(hours), y = Group.1)) + xlab("Hours")  + geom_tile(aes(fill = x)) + scale_fill_gradient(name="Average Counts", low="white", high="purple") + theme(axis.title.y = element_blank())
     p<-p+values$label
     
-    return(p)
-      
+    print(p)   
   })
   
   
-  #plotInput <- reactive({
-  #  p<-ggplot(values$output, aes(x = as.factor(hours), y = Group.1)) + xlab("Hours")  + geom_tile(aes(fill = x)) + scale_fill_gradient(name="Average Counts", low="white", high="purple") + theme(axis.title.y = element_blank())
-  #  p<-p+values$label
-  #})
+  plotInput <- reactive({
+    p<-ggplot(values$output, aes(x = as.factor(hours), y = Group.1)) + xlab("Hours")  + geom_tile(aes(fill = x)) + scale_fill_gradient(name="Average Counts", low="white", high="purple") + theme(axis.title.y = element_blank())
+    p<-p+values$label
+  })
   
   
   # Save graphs/plot
-  #output$downloadPlot <- downloadHandler(
-  #  filename = function() {"heatmap.png"},
-  #  content = function(file) {
-  #    #ggsave(plotInput,file)
-  #    png(file)
-  #    print(plotInput()) # Fixed solution with this link http://stackoverflow.com/questions/14810409/save-plots-made-in-a-shiny-app
-  #    dev.off()
-  # }
-  #)
+  output$downloadPlot <- downloadHandler(
+    filename = function() {"heatmap.png"},
+    content = function(file) {
+      #ggsave(plotInput,file)
+      png(file)
+      print(plotInput()) # Fixed solution with this link http://stackoverflow.com/questions/14810409/save-plots-made-in-a-shiny-app
+      dev.off()
+   }
+  )
   
   # Summary Table creation
   output$table<-renderDataTable({
@@ -251,8 +249,7 @@ shinyServer(function(input, output, session) {
     values$data[2:12]
   },options = list(lengthMenu = c(10,25,50,100),pageLength=10)) # Set the lengthMenu and pageLength
 
-  
-  
+
   output$scatterPlot <- renderPlot({
     # Input for All years from 2011 to 2012
     if(input$years2=="All") {

@@ -1,12 +1,10 @@
 library(shiny)
-library(markdown)
 
 
 shinyUI(navbarPage("BikeShare",fluid=TRUE,
 tabPanel("Heatmap",
          # Generate a row with a sidebar
          sidebarLayout(fluid=TRUE,
-           
            # Define the sidebar with one input
            sidebarPanel(
              # Partial example
@@ -35,10 +33,10 @@ tabPanel("Heatmap",
              tags$a(href="https://www.kaggle.com/c/bike-sharing-demand","Kaggle Competition"),
              br(),
              tags$a(href="https://www.capitalbikeshare.com/","Washington DC BikeShare Website"),
-             hr()
-             #br(),
-             #br(),
-             #downloadButton('downloadPlot', 'Download Plot')
+             hr(),
+             br(),
+             br(),
+             downloadButton('downloadPlot', 'Download Plot')
            ),
 
            # Create a spot for the barplot
@@ -65,9 +63,7 @@ tabPanel("Plot",
                         c("Plot"="plot",
                           "Line" = "line",
                           "SE (95% CI)" = "se",
-                          "Boxplot"="boxplot"))#,
-           #hr(),
-           #downloadButton('downloadPlot', 'Download Plot')
+                          "Boxplot"="boxplot"))
          ),
          mainPanel(width=8,
            plotOutput("scatterPlot")
